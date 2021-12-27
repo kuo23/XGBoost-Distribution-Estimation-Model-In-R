@@ -7,82 +7,26 @@
 ## Implementation
 將XGBoost的迴歸樹 Loss function 更改為最大概似法估計(Maximum Likelihood Estimation)進行梯度下降如下所示。
 將$L(y)$變更為$-logP(y)$。 其中$P(y)$以常態分配(Normal distribution)之p.d.f為例。
-$$
-L(y) = \frac{1}{2}(y_i-\hat{y_i})^2 \rightarrow -log P(y)
-$$
+<p align="center">
+<img src="https://render.githubusercontent.com/render/math?math=L(y)%20%3D%20%5Cfrac%7B1%7D%7B2%7D(y_i-%5Chat%7By_i%7D)%5E2%20%5Crightarrow%20-log%20P(y)">
+</p>
+<p align="center">
+<img src="https://render.githubusercontent.com/render/math?math=%5Cbegin%7Bsplit%7D%0A%5Clarge%0AP(y)%20%26%3D%20%5Clarge%5Cfrac%7B1%7D%7B%5Csigma%5Csqrt%7B2%5Cpi%7D%7D%5Clarge%20e%5E%7B-%5Cfrac%7B1%7D%7B2%7D(%5Cfrac%7By-%5Cmu%7D%7B%5Csigma%7D)%5E2%7D%0A%5Cend%7Bsplit%7D"></p>
 
-$$
-\begin{split}
-\large
-P(y) &= \large\frac{1}{\sigma\sqrt{2\pi}}\large e^{-\frac{1}{2}(\frac{y-\mu}{\sigma})^2}
-\end{split}
-$$
-
-參考Ngboost(2019)所使用之Fisher information metric，以正確計算每個參數之梯度。
-$$
-\begin{split}
-\text{Set t} &= log(\sigma) \\
-\\
-l(\theta) &=-logP(y)\\
-&= \frac{1}{2} log(\sigma^2)+\frac{(y-\mu)^2}{2\sigma^2}\\
-&= t +\frac{(y-\mu)^2}{2e^{2t}}
-\end{split}\\
-$$
-$$
-\begin{split}
-&I_{\theta} =E_{y\sim P_{\theta}}
-\large\left[
-\begin{array}{cc}
-\frac{\partial^2 l}{\partial^2 \mu}  
-&
-\frac{\partial^2 l}{\partial \mu\partial t} 
-\\
-\frac{\partial^2 l}{\partial t\partial\mu}
-& \frac{\partial^2 l}{\partial^2 t}\\
-\end{array}
-\right] = E_{y\sim P_{\theta}}
-\large\left[
-\begin{array}{cc}
- \frac{1}{e^{2t}}  
-&
-\frac{2(y-\mu)}{e^{2t}} 
-\\
-\frac{2(y-\mu)}{e^{2t}} 
-&  \frac{2(y-\mu)^2}{e^{2t}} \\
-\end{array}
-\right]
-\end{split}
-$$
-
+參考[Ngboost(2019)](https://github.com/stanfordmlgroup/ngboost)所使用之Fisher information metric，以正確計算每個參數之梯度。
+<p align="center">
+<img src="https://render.githubusercontent.com/render/math?math=%5Cbegin%7Bsplit%7D%0A%5Ctext%7BSet%20t%7D%20%26%3D%20log(%5Csigma)%20%5C%5C%0A%5C%5C%0Al(%5Ctheta)%20%26%3D-logP(y)%5C%5C%0A%26%3D%20%5Cfrac%7B1%7D%7B2%7D%20log(%5Csigma%5E2)%2B%5Cfrac%7B(y-%5Cmu)%5E2%7D%7B2%5Csigma%5E2%7D%5C%5C%0A%26%3D%20t%20%2B%5Cfrac%7B(y-%5Cmu)%5E2%7D%7B2e%5E%7B2t%7D%7D%0A%5Cend%7Bsplit%7D%5C%5C">
+</p>
+<p align="center">
+<img src="https://render.githubusercontent.com/render/math?math=%5Cbegin%7Bsplit%7D%0A%26I_%7B%5Ctheta%7D%20%3DE_%7By%5Csim%20P_%7B%5Ctheta%7D%7D%0A%5Clarge%5Cleft%5B%0A%5Cbegin%7Barray%7D%7Bcc%7D%0A%5Cfrac%7B%5Cpartial%5E2%20l%7D%7B%5Cpartial%5E2%20%5Cmu%7D%20%20%0A%26%0A%5Cfrac%7B%5Cpartial%5E2%20l%7D%7B%5Cpartial%20%5Cmu%5Cpartial%20t%7D%20%0A%5C%5C%0A%5Cfrac%7B%5Cpartial%5E2%20l%7D%7B%5Cpartial%20t%5Cpartial%5Cmu%7D%0A%26%20%5Cfrac%7B%5Cpartial%5E2%20l%7D%7B%5Cpartial%5E2%20t%7D%5C%5C%0A%5Cend%7Barray%7D%0A%5Cright%5D%20%3D%20E_%7By%5Csim%20P_%7B%5Ctheta%7D%7D%0A%5Clarge%5Cleft%5B%0A%5Cbegin%7Barray%7D%7Bcc%7D%0A%20%5Cfrac%7B1%7D%7Be%5E%7B2t%7D%7D%20%20%0A%26%0A%5Cfrac%7B2(y-%5Cmu)%7D%7Be%5E%7B2t%7D%7D%20%0A%5C%5C%0A%5Cfrac%7B2(y-%5Cmu)%7D%7Be%5E%7B2t%7D%7D%20%0A%26%20%20%5Cfrac%7B2(y-%5Cmu)%5E2%7D%7Be%5E%7B2t%7D%7D%20%5C%5C%0A%5Cend%7Barray%7D%0A%5Cright%5D%0A%5Cend%7Bsplit%7D">
+</p>
 經整理後設計兩個不同的XGBoost Decision Tree 模型$\large f_{\mu}(x)、 f_{t}(x)$以分別預測常態分佈的兩個參數，其中之$\large g、h$值如以下所示：
-
-$$
-\begin{split}
-\\
-f_{\mu} 
-\left 
-\{
-\begin{array}{cc}
-g_i  &=  -\frac{y-\mu}{1+e^{2t} \epsilon}& \\
-h_i  &= 1 
-\end{array}
-\right. 
-\end{split}
-$$
-
-$$
-\begin{split}
-f_{\ t} 
-\left 
-\{
-\begin{array}{cc}
-g_i &=\frac{1}{2}-\frac{(y-\mu)^2}{2e^{2t}} \\
-h_i &= 1\\
-\end{array}
-\right. 
-\end{split}
-$$
-
+<p align="center">
+<img src="https://render.githubusercontent.com/render/math?math=%5Cbegin%7Bsplit%7D%0A%5C%5C%0Af_%7B%5Cmu%7D%20%0A%5Cleft%20%0A%5C%7B%0A%5Cbegin%7Barray%7D%7Bcc%7D%0Ag_i%20%20%26%3D%20%20-%5Cfrac%7By-%5Cmu%7D%7B1%2Be%5E%7B2t%7D%20%5Cepsilon%7D%26%20%5C%5C%0Ah_i%20%20%26%3D%201%20%0A%5Cend%7Barray%7D%0A%5Cright.%20%0A%5Cend%7Bsplit%7D">
+</p>
+<p align="center">
+<img src="https://render.githubusercontent.com/render/math?math=%5Cbegin%7Bsplit%7D%0Af_%7B%5C%20t%7D%20%0A%5Cleft%20%0A%5C%7B%0A%5Cbegin%7Barray%7D%7Bcc%7D%0Ag_i%20%26%3D%5Cfrac%7B1%7D%7B2%7D-%5Cfrac%7B(y-%5Cmu)%5E2%7D%7B2e%5E%7B2t%7D%7D%20%5C%5C%0Ah_i%20%26%3D%201%5C%5C%0A%5Cend%7Barray%7D%0A%5Cright.%20%0A%5Cend%7Bsplit%7D">
+</p>
 
 
 ## Verification
@@ -131,4 +75,4 @@ model = CustomXgb(trainData = trainData,
 
 
 
-詳細使用方法可以參考`walkthrough.R`
+詳細使用方法可以參考`src/walkthrough.R`
