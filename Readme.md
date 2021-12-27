@@ -6,12 +6,11 @@
 
 ## Implementation
 將XGBoost的迴歸樹 Loss function 更改為最大概似法估計(Maximum Likelihood Estimation)進行梯度下降如下所示。
-將$L(y)$變更為$-logP(y)$。 其中$P(y)$以常態分配(Normal distribution)之p.d.f為例。
-<p align="center">
-<img src="https://render.githubusercontent.com/render/math?math=L(y)%20%3D%20%5Cfrac%7B1%7D%7B2%7D(y_i-%5Chat%7By_i%7D)%5E2%20%5Crightarrow%20-log%20P(y)">
-</p>
+將<img src="https://latex.codecogs.com/svg.image?L(y)&space;" title="L(y) " />變更為。<img src="https://latex.codecogs.com/svg.image?-logP(y)" title="-logP(y)" /> 其中<img src="https://latex.codecogs.com/svg.image?P(y)" title="P(y)" />以常態分配(Normal distribution)之p.d.f為例。
+
 <p align="center">
 <img src="https://render.githubusercontent.com/render/math?math=%5Cbegin%7Bsplit%7D%0A%5Clarge%0AP(y)%20%26%3D%20%5Clarge%5Cfrac%7B1%7D%7B%5Csigma%5Csqrt%7B2%5Cpi%7D%7D%5Clarge%20e%5E%7B-%5Cfrac%7B1%7D%7B2%7D(%5Cfrac%7By-%5Cmu%7D%7B%5Csigma%7D)%5E2%7D%0A%5Cend%7Bsplit%7D"></p>
+
 
 參考[Ngboost(2019)](https://github.com/stanfordmlgroup/ngboost)所使用之Fisher information metric，以正確計算每個參數之梯度。
 <p align="center">
